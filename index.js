@@ -6,6 +6,7 @@ const app = express();
 
 app.use(express.json())
 const authorRoute = require("./routes/author.routes")
+const bookRoute = require("./routes/book.routes")
 
 // connect to db
 
@@ -19,6 +20,7 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use("/api", authorRoute) 
+app.use("/api", bookRoute)
 
 // listen to server on port 4000
 
