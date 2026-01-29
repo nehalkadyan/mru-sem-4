@@ -1,9 +1,11 @@
 const express = require("express");
-const {createAuthor, getAuthorBooks} = require("../controllers/author.controller")
+const {createAuthor, getAuthorBooks, getAuthors} = require("../controllers/author.controller")
 const router = express.Router()
 
 router.post("/create-author", createAuthor);
 
-router.get("/author-details", getAuthorBooks)
+router.get("/author-details/:authorId", getAuthorBooks)
 
-module.exports = router
+router.get("/get-authors", getAuthors)
+
+module.exports = router;

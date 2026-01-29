@@ -24,7 +24,7 @@ const createAuthor = async (req, res) => {
 
 const getAuthorBooks = async (req, res) => {
   try {
-    const { authorId } = req.body;
+    const { authorId } = req.params;
     // 6971cc053733b9880be3aaac
     // perform aggregation
     const data = await Author.aggregate([
@@ -36,27 +36,66 @@ const getAuthorBooks = async (req, res) => {
       },
       // stage 2
       {
-        $lookup : {
-          from : "books",
-          localField : "_id",
-          foreignField : "authorId",
-          as : "book-details"
-        }
+        $lookup: {
+          from: "books",
+          localField: "_id",
+          foreignField: "authorId",
+          as: "book-details",
+        },
       },
-      
-      // stage 3 
+
+      // stage 3
       {
-        $unwind : {
-           path : "$book-details"
-        }
-      }
+        $unwind: {
+          path: "$book-details",
+        },
+      },
     ]);
     return res
       .status(200)
-      .json({ message: "author details fetched successfully", result : data });
+      .json({ message: "author details fetched successfully", result: data });
   } catch (err) {
     console.log("err", err.message);
   }
 };
 
-module.exports = { createAuthor, getAuthorBooks };
+const getAuthors = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page); // "1" -> 1 (Number)
+    const limit = parseInt(req.query.limit); // "2" -> 2 (Number)
+
+    // skip formula
+    const skip = (page - 1) * limit;
+    // aggregation pipeline
+    const data = await Author.aggregate([
+      // stage 1
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      // stage 2
+      {
+        $skip: skip,
+      },
+      // stage 3
+      {
+        $limit: limit,
+      },
+    ]);
+
+    const totalCount = await Author.countDocuments();
+    //  200 ->success (OK response)
+    // 201 -> created
+    return res
+      .status(200)
+      .json({
+        message: "author data fetched successfully",
+        result: { ...data, totalCount },
+      });
+  } catch (err) {
+    console.log("err", err.message);
+  }
+};
+
+module.exports = { createAuthor, getAuthorBooks, getAuthors };

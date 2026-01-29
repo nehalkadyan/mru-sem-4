@@ -19,4 +19,14 @@ const publishBook = async (req, res) => {
     }
 }
 
+// controller to get books
+
+const getBooks = async(req, res) => {
+    try{
+       
+    }catch(err){
+        console.log("err", err)
+    }
+}
+
 module.exports = { publishBook };
